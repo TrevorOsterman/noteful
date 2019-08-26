@@ -12,15 +12,13 @@ import config from "../config";
 import "./App.css";
 
 class App extends Component {
-  state = {
-    notes: [],
-    folders: []
-  };
-
-  addNote(note) {
-    this.setState({
-      notes: [...this.state.notes, note]
-    });
+  constructor(props) {
+    super(props);
+    this.state = {
+      notes: [],
+      folders: []
+    };
+    this.addNote = this.addNote.bind(this);
   }
 
   componentDidMount() {
@@ -41,6 +39,12 @@ class App extends Component {
       .catch(error => {
         console.error({ error });
       });
+  }
+
+  addNote(note) {
+    this.setState({
+      notes: [...this.state.notes, note]
+    });
   }
 
   handleDeleteNote = noteId => {
