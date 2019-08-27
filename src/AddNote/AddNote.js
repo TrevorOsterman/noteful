@@ -49,15 +49,15 @@ export default class AddNote extends React.Component {
   }
 
   updateName(name) {
-    this.setState({ name: name, touched: false });
+    this.setState({ name: name, touched: true });
   }
 
   updateContent(content) {
-    this.setState({ content: content, touched: false });
+    this.setState({ content: content, touched: true });
   }
 
   updateFolder(folder) {
-    this.setState({ folder: folder, touched: false });
+    this.setState({ folder: folder, touched: true });
   }
 
   validateName() {
