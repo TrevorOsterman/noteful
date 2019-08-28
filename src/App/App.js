@@ -10,6 +10,7 @@ import AddFolder from "../AddFolder/AddFolder";
 import AddNote from "../AddNote/AddNote";
 import config from "../config";
 import "./App.css";
+import ErrorBoundary from "../ErrorBoundary";
 
 class App extends Component {
   constructor(props) {
@@ -19,6 +20,7 @@ class App extends Component {
       folders: []
     };
     this.addNote = this.addNote.bind(this);
+    this.addFolder = this.addFolder.bind(this);
   }
 
   componentDidMount() {
@@ -45,6 +47,10 @@ class App extends Component {
     this.setState({
       notes: [...this.state.notes, note]
     });
+  }
+
+  addFolder(folder) {
+    this.setState({ folders: [...this.state.folders, folder] });
   }
 
   handleDeleteNote = noteId => {
@@ -84,19 +90,24 @@ class App extends Component {
       notes: this.state.notes,
       folders: this.state.folders,
       deleteNote: this.handleDeleteNote,
-      addNote: this.addNote
+      addNote: this.addNote,
+      addFolder: this.addFolder
     };
     return (
       <ApiContext.Provider value={value}>
         <div className="App">
-          <nav className="App__nav">{this.renderNavRoutes()}</nav>
+          <ErrorBoundary>
+            <nav className="App__nav">{this.renderNavRoutes()}</nav>
+          </ErrorBoundary>
           <header className="App__header">
             <h1>
               <Link to="/">Noteful</Link>{" "}
               <FontAwesomeIcon icon="check-double" />
             </h1>
           </header>
-          <main className="App__main">{this.renderMainRoutes()}</main>
+          <ErrorBoundary>
+            <main className="App__main">{this.renderMainRoutes()}</main>
+          </ErrorBoundary>
         </div>
       </ApiContext.Provider>
     );

@@ -22,6 +22,7 @@ export default class AddNote extends React.Component {
       content: this.state.content.value,
       folderId: this.state.folder.value
     };
+
     const url = `${config.API_ENDPOINT}/notes`;
     const options = {
       method: "POST",
@@ -36,36 +37,37 @@ export default class AddNote extends React.Component {
         if (!res.ok) {
           throw new Error("Something went wrong");
         }
-        console.log(res.json());
+        return res.json();
       })
       .then(data => {
-        this.context.addNote(note);
+        this.context.addNote(data);
         this.setState({
           name: { value: "", touched: false },
           content: { value: "", touched: false },
           folder: { value: "", touched: false }
         });
       });
+
+    this.props.history.push("/");
   }
 
   updateName(name) {
-    this.setState({ name: name, touched: true });
+    this.setState({ name: { value: name, touched: true } });
   }
 
   updateContent(content) {
-    this.setState({ content: content, touched: true });
+    this.setState({ content: { value: content, touched: true } });
   }
 
   updateFolder(folder) {
-    this.setState({ folder: folder, touched: true });
+    this.setState({ folder: { value: folder, touched: true } });
   }
 
   validateName() {
-    console.log(this.state.name.value);
-    // const name = this.state.name.value.trim();
-    // if (name.length === 0) {
-    //   return "Name is required";
-    // }
+    const name = this.state.name.value.trim();
+    if (name.length === 0) {
+      return "Name is required";
+    }
   }
 
   render() {

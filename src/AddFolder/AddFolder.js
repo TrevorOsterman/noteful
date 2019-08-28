@@ -1,5 +1,7 @@
 import React from "react";
 import ValidationError from "../ValidationError/ValidationError";
+import config from "../config.js";
+import ApiContext from "../ApiContext";
 
 export default class AddFolder extends React.Component {
   constructor(props) {
@@ -10,9 +12,34 @@ export default class AddFolder extends React.Component {
     };
   }
 
+  static contextType = ApiContext;
+
   handleSubmit(event) {
     event.preventDefault();
-    const name = this.state.folderName;
+    const folder = { name: this.state.folderName };
+
+    const url = `${config.API_ENDPOINT}/folders`;
+    const options = {
+      method: "POST",
+      body: JSON.stringify(folder),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+
+    fetch(url, options)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Something went wrong");
+        }
+        return res.json();
+      })
+      .then(data => {
+        this.context.addFolder(data);
+        this.setState({ folderName: "", touched: false });
+      });
+
+    this.props.history.push("/");
   }
 
   updateName(name) {
@@ -46,7 +73,7 @@ export default class AddFolder extends React.Component {
         <button type="reset">Reset</button>
         <button
           type="submit"
-          onClick={this.handleSubmit}
+          onClick={e => this.handleSubmit(e)}
           disabled={this.validateName()}
         >
           Save
