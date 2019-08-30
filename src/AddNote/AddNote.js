@@ -17,6 +17,9 @@ export default class AddNote extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    let date = new Date();
+    console.log(date);
+    this.setState({ modified: date });
     const note = {
       name: this.state.name.value,
       content: this.state.content.value,
@@ -46,9 +49,8 @@ export default class AddNote extends React.Component {
           content: { value: "", touched: false },
           folder: { value: "", touched: false }
         });
+        this.props.history.push("/");
       });
-
-    this.props.history.push("/");
   }
 
   updateName(name) {
@@ -73,7 +75,7 @@ export default class AddNote extends React.Component {
   render() {
     const { folders } = this.context;
     const folderNames = folders.map(name => {
-      return <option id={name.id}>{name.id}</option>;
+      return <option key={name.id}>{name.id}</option>;
     });
     return (
       <form>
