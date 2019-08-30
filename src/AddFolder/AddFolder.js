@@ -37,9 +37,8 @@ export default class AddFolder extends React.Component {
       .then(data => {
         this.context.addFolder(data);
         this.setState({ folderName: "", touched: false });
+        this.props.history.push("/");
       });
-
-    this.props.history.push("/");
   }
 
   updateName(name) {
