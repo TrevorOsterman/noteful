@@ -7,7 +7,9 @@ import NoteListMain from "../NoteListMain/NoteListMain";
 import NotePageMain from "../NotePageMain/NotePageMain";
 import ApiContext from "../ApiContext";
 import AddFolder from "../AddFolder/AddFolder";
+import EditFolder from "../EditFolder/EditFolder";
 import AddNote from "../AddNote/AddNote";
+import EditNote from "../EditNote/EditNote";
 import config from "../config";
 import "./App.css";
 import ErrorBoundary from "../ErrorBoundary";
@@ -21,6 +23,7 @@ class App extends Component {
     };
     this.addNote = this.addNote.bind(this);
     this.addFolder = this.addFolder.bind(this);
+    this.editNote = this.editNote.bind(this);
   }
 
   componentDidMount() {
@@ -43,9 +46,35 @@ class App extends Component {
       });
   }
 
+  componentDidUpdate() {
+    Promise.all([
+      fetch(`${config.API_ENDPOINT}/notes`),
+      fetch(`${config.API_ENDPOINT}/folders`)
+    ])
+      .then(([notesRes, foldersRes]) => {
+        if (!notesRes.ok) return notesRes.json().then(e => Promise.reject(e));
+        if (!foldersRes.ok)
+          return foldersRes.json().then(e => Promise.reject(e));
+
+        return Promise.all([notesRes.json(), foldersRes.json()]);
+      })
+      .then(([notes, folders]) => {
+        this.setState({ notes, folders });
+      })
+      .catch(error => {
+        console.error({ error });
+      });
+  }
+
   addNote(note) {
     this.setState({
       notes: [...this.state.notes, note]
+    });
+  }
+
+  editNote(note, id) {
+    this.setState({
+      notes: [...this.state.notes.filter(oldNote => oldNote.id !== id), note]
     });
   }
 
@@ -81,6 +110,7 @@ class App extends Component {
         <Route path="/note/:noteId" component={NotePageMain} />
         <Route path="/add-folder" component={AddFolder} />
         <Route path="/add-note" component={AddNote} />
+        <Route path="/edit-note/:noteId" component={EditNote} />
       </>
     );
   }
@@ -91,7 +121,8 @@ class App extends Component {
       folders: this.state.folders,
       deleteNote: this.handleDeleteNote,
       addNote: this.addNote,
-      addFolder: this.addFolder
+      addFolder: this.addFolder,
+      editNote: this.editNote
     };
     return (
       <ApiContext.Provider value={value}>

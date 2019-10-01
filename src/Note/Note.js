@@ -15,7 +15,6 @@ export default class Note extends React.Component {
   handleClickDelete = e => {
     e.preventDefault();
     const noteId = this.props.id;
-
     fetch(`${config.API_ENDPOINT}/notes/${noteId}`, {
       method: "DELETE",
       headers: {
@@ -36,6 +35,15 @@ export default class Note extends React.Component {
       });
   };
 
+  handleClickEdit = e => {
+    e.preventDefault();
+    const noteId = this.props.id;
+    console.log(noteId);
+    const { history } = this.props;
+    console.log(history);
+    // history.push(`/edit-note/${noteId}`);
+  };
+
   render() {
     const { name, id, modified } = this.props;
     return (
@@ -50,9 +58,10 @@ export default class Note extends React.Component {
         >
           <FontAwesomeIcon icon="trash-alt" /> remove
         </button>
+        <Link to={`/edit-note/${id}`}>Edit</Link>
         <div className="Note__dates">
           <div className="Note__dates-modified">
-            Modified{" "}
+            Created{" "}
             <span className="Date">{format(modified, "Do MMM YYYY")}</span>
           </div>
         </div>

@@ -3,39 +3,22 @@ import ApiContext from "../ApiContext";
 import config from "../config";
 import ValidationError from "../ValidationError/ValidationError";
 
-export default class AddNote extends React.Component {
+export default class EditNote extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: { value: "", touched: false },
+      title: { value: "", touched: false },
       content: { value: "", touched: false },
-      folder: { value: "", touched: false }
+      folder: { value: "", touched: false },
+      id: null
     };
   }
 
   static contextType = ApiContext;
 
-  handleSubmit(event) {
-    event.preventDefault();
-    let date = new Date();
-    console.log(date);
-    this.setState({ modified: date });
-    const note = {
-      title: this.state.name.value,
-      content: this.state.content.value,
-      folder: this.state.folder.value
-    };
-
-    const url = `${config.API_ENDPOINT}/notes`;
-    const options = {
-      method: "POST",
-      body: JSON.stringify(note),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-
-    fetch(url, options)
+  componentDidMount() {
+    const noteId = this.props.match.params.noteId;
+    fetch(`${config.API_ENDPOINT}/notes/${noteId}`)
       .then(res => {
         if (!res.ok) {
           throw new Error("Something went wrong");
@@ -43,9 +26,44 @@ export default class AddNote extends React.Component {
         return res.json();
       })
       .then(data => {
-        this.context.addNote(data);
         this.setState({
-          name: { value: "", touched: false },
+          title: { value: data.title },
+          content: { value: data.content },
+          folder: { value: data.folder },
+          id: data.id
+        });
+      });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    let date = new Date();
+    this.setState({ modified: date });
+    const note = {
+      title: this.state.title.value,
+      content: this.state.content.value,
+      folder: this.state.folder.value
+    };
+
+    const noteId = this.props.match.params.noteId;
+    const url = `${config.API_ENDPOINT}/notes/${noteId}`;
+    const options = {
+      method: "PATCH",
+      body: JSON.stringify(note),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+    this.context.editNote(options.body, this.state.id);
+    fetch(url, options)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Something went wrong");
+        }
+      })
+      .then(data => {
+        this.setState({
+          title: { value: "", touched: false },
           content: { value: "", touched: false },
           folder: { value: "", touched: false }
         });
@@ -54,7 +72,7 @@ export default class AddNote extends React.Component {
   }
 
   updateName(name) {
-    this.setState({ name: { value: name, touched: true } });
+    this.setState({ title: { value: name, touched: true } });
   }
 
   updateContent(content) {
@@ -66,7 +84,7 @@ export default class AddNote extends React.Component {
   }
 
   validateName() {
-    const name = this.state.name.value.trim();
+    const name = this.state.title.value.trim();
     if (name.length === 0) {
       return "Name is required";
     }
@@ -79,19 +97,27 @@ export default class AddNote extends React.Component {
     });
     return (
       <form>
-        <h2>Add Note</h2>
+        <h2>Edit Note</h2>
         <label>Note Name:</label>
-        <input type="text" onChange={e => this.updateName(e.target.value)} />
-        {this.state.name.touched && (
+        <input
+          type="text"
+          value={this.state.title.value}
+          onChange={e => this.updateName(e.target.value)}
+        />
+        {this.state.title.touched && (
           <ValidationError message={this.validateName()} />
         )}
         <label>Content:</label>
         <input
           type="textarea"
+          value={this.state.content.value}
           onChange={e => this.updateContent(e.target.value)}
         />
         <label>Folder:</label>
-        <select onChange={e => this.updateFolder(e.target.value)}>
+        <select
+          value={this.state.folder.value}
+          onChange={e => this.updateFolder(e.target.value)}
+        >
           <option>Select a folder</option>
           {folderNames}
         </select>
