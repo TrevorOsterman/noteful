@@ -62,7 +62,9 @@ export default class AddNote extends React.Component {
   }
 
   updateFolder(folder) {
-    this.setState({ folder: { value: folder, touched: true } });
+    const folderId = this.context.folders.find(fold => fold.title === folder);
+    console.log(folderId);
+    this.setState({ folder: { value: folderId.id, touched: true } });
   }
 
   validateName() {
@@ -72,10 +74,16 @@ export default class AddNote extends React.Component {
     }
   }
 
+  validateFolder() {
+    if (!this.state.folder.touched) {
+      return "Choose a folder";
+    }
+  }
+
   render() {
     const { folders } = this.context;
     const folderNames = folders.map(name => {
-      return <option key={name.id}>{name.id}</option>;
+      return <option key={name.id}>{name.title}</option>;
     });
     return (
       <form>
@@ -91,7 +99,10 @@ export default class AddNote extends React.Component {
           onChange={e => this.updateContent(e.target.value)}
         />
         <label>Folder:</label>
-        <select onChange={e => this.updateFolder(e.target.value)}>
+        <select
+          disabled={this.validateName()}
+          onChange={e => this.updateFolder(e.target.value)}
+        >
           <option>Select a folder</option>
           {folderNames}
         </select>
@@ -99,7 +110,7 @@ export default class AddNote extends React.Component {
         <button
           type="submit"
           onClick={e => this.handleSubmit(e)}
-          disabled={this.validateName()}
+          disabled={this.validateFolder()}
         >
           Save
         </button>

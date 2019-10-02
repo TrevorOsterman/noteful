@@ -55,6 +55,7 @@ export default class EditNote extends React.Component {
       }
     };
     this.context.editNote(options.body, this.state.id);
+    this.props = this.state;
     fetch(url, options)
       .then(res => {
         if (!res.ok) {
@@ -80,7 +81,9 @@ export default class EditNote extends React.Component {
   }
 
   updateFolder(folder) {
-    this.setState({ folder: { value: folder, touched: true } });
+    const folderId = this.context.folders.find(fold => fold.title === folder);
+    console.log(folderId);
+    this.setState({ folder: { value: folderId.id, touched: true } });
   }
 
   validateName() {
@@ -93,7 +96,7 @@ export default class EditNote extends React.Component {
   render() {
     const { folders } = this.context;
     const folderNames = folders.map(name => {
-      return <option key={name.id}>{name.id}</option>;
+      return <option key={name.id}>{name.title}</option>;
     });
     return (
       <form>
@@ -118,7 +121,6 @@ export default class EditNote extends React.Component {
           value={this.state.folder.value}
           onChange={e => this.updateFolder(e.target.value)}
         >
-          <option>Select a folder</option>
           {folderNames}
         </select>
         <button type="reset">Reset</button>

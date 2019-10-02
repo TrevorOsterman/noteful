@@ -24,6 +24,7 @@ class App extends Component {
     this.addNote = this.addNote.bind(this);
     this.addFolder = this.addFolder.bind(this);
     this.editNote = this.editNote.bind(this);
+    this.editFolder = this.editFolder.bind(this);
   }
 
   componentDidMount() {
@@ -46,25 +47,26 @@ class App extends Component {
       });
   }
 
-  componentDidUpdate() {
-    Promise.all([
-      fetch(`${config.API_ENDPOINT}/notes`),
-      fetch(`${config.API_ENDPOINT}/folders`)
-    ])
-      .then(([notesRes, foldersRes]) => {
-        if (!notesRes.ok) return notesRes.json().then(e => Promise.reject(e));
-        if (!foldersRes.ok)
-          return foldersRes.json().then(e => Promise.reject(e));
-
-        return Promise.all([notesRes.json(), foldersRes.json()]);
-      })
-      .then(([notes, folders]) => {
-        this.setState({ notes, folders });
-      })
-      .catch(error => {
-        console.error({ error });
-      });
-  }
+  // componentDidUpdate() {
+  //   Promise.all([
+  //     fetch(`${config.API_ENDPOINT}/notes`),
+  //     fetch(`${config.API_ENDPOINT}/folders`)
+  //   ])
+  //     .then(([notesRes, foldersRes]) => {
+  //       if (!notesRes.ok) return notesRes.json().then(e => Promise.reject(e));
+  //       if (!foldersRes.ok)
+  //         return foldersRes.json().then(e => Promise.reject(e));
+  //
+  //       return Promise.all([notesRes.json(), foldersRes.json()]);
+  //     })
+  //     .then(([notes, folders]) => {
+  //       console.log(notes);
+  //       console.log(folders);
+  //     })
+  //     .catch(error => {
+  //       console.error({ error });
+  //     });
+  // }
 
   addNote(note) {
     this.setState({
@@ -73,6 +75,7 @@ class App extends Component {
   }
 
   editNote(note, id) {
+    console.log(note);
     this.setState({
       notes: [...this.state.notes.filter(oldNote => oldNote.id !== id), note]
     });
@@ -82,9 +85,24 @@ class App extends Component {
     this.setState({ folders: [...this.state.folders, folder] });
   }
 
+  editFolder(folder, id) {
+    this.setState({
+      folders: [
+        ...this.state.folders.filter(oldFold => oldFold.id !== id),
+        folder
+      ]
+    });
+  }
+
   handleDeleteNote = noteId => {
     this.setState({
       notes: this.state.notes.filter(note => note.id !== noteId)
+    });
+  };
+
+  handleDeleteFolder = folderId => {
+    this.setState({
+      folders: this.state.folders.filter(folder => folder.id !== folderId)
     });
   };
 
@@ -97,6 +115,8 @@ class App extends Component {
         <Route path="/note/:noteId" component={NotePageNav} />
         <Route path="/add-folder" component={NotePageNav} />
         <Route path="/add-note" component={NotePageNav} />
+        <Route path="/edit-note/:noteId" component={NotePageNav} />
+        <Route path="/edit-folder/:folderId" component={NotePageNav} />
       </>
     );
   }
@@ -111,6 +131,7 @@ class App extends Component {
         <Route path="/add-folder" component={AddFolder} />
         <Route path="/add-note" component={AddNote} />
         <Route path="/edit-note/:noteId" component={EditNote} />
+        <Route path="/edit-folder/:folderId" component={EditFolder} />
       </>
     );
   }
@@ -120,9 +141,11 @@ class App extends Component {
       notes: this.state.notes,
       folders: this.state.folders,
       deleteNote: this.handleDeleteNote,
+      deleteFolder: this.handleDeleteFolder,
       addNote: this.addNote,
       addFolder: this.addFolder,
-      editNote: this.editNote
+      editNote: this.editNote,
+      editFolder: this.editFolder
     };
     return (
       <ApiContext.Provider value={value}>

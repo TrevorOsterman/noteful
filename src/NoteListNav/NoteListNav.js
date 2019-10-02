@@ -5,9 +5,28 @@ import CircleButton from "../CircleButton/CircleButton";
 import ApiContext from "../ApiContext";
 import { countNotesForFolder } from "../notes-helpers";
 import "./NoteListNav.css";
+import config from "../config";
 
 export default class NoteListNav extends React.Component {
   static contextType = ApiContext;
+
+  handleEditFolder(id) {
+    this.props.history.push(`/edit-folder/${id}`);
+  }
+
+  handleDeleteFolder(id) {
+    const folderId = id;
+    fetch(`${config.API_ENDPOINT}/folders/${folderId}`, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json"
+      }
+    })
+      .then(res => {
+        if (!res.ok) return res.json();
+      })
+      .then(res => this.context.handleDeteleFolder);
+  }
 
   render() {
     const { folders = [], notes = [] } = this.context;
@@ -25,6 +44,20 @@ export default class NoteListNav extends React.Component {
                 </span>
                 {folder.title}
               </NavLink>
+              <div className="NavButtonWrapper">
+                <button
+                  className="NoteListNav_button"
+                  onClick={() => this.handleEditFolder(folder.id)}
+                >
+                  edit
+                </button>
+                <button
+                  className="NoteListNav_button"
+                  onClick={() => this.handleDeleteFolder(folder.id)}
+                >
+                  delete
+                </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -38,16 +71,6 @@ export default class NoteListNav extends React.Component {
             <FontAwesomeIcon icon="plus" />
             <br />
             Folder
-          </CircleButton>
-          <CircleButton
-            tag={Link}
-            to="/edit-folder"
-            type="button"
-            className="NoteListNav__add-folder-button"
-          >
-            // <FontAwesomeIcon icon="clock" />
-            <br />
-            Manage
           </CircleButton>
         </div>
       </div>
