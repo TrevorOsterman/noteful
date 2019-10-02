@@ -2,6 +2,7 @@ import React from "react";
 import ApiContext from "../ApiContext";
 import config from "../config";
 import ValidationError from "../ValidationError/ValidationError";
+import "./AddNote.css";
 
 export default class AddNote extends React.Component {
   constructor(props) {
@@ -86,7 +87,7 @@ export default class AddNote extends React.Component {
       return <option key={name.id}>{name.title}</option>;
     });
     return (
-      <form>
+      <form className="note_form">
         <h2>Add Note</h2>
         <label>Note Name:</label>
         <input type="text" onChange={e => this.updateName(e.target.value)} />
@@ -94,8 +95,8 @@ export default class AddNote extends React.Component {
           <ValidationError message={this.validateName()} />
         )}
         <label>Content:</label>
-        <input
-          type="textarea"
+        <textarea
+          rows="10"
           onChange={e => this.updateContent(e.target.value)}
         />
         <label>Folder:</label>
