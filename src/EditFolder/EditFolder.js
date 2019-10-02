@@ -35,7 +35,7 @@ export default class EditFolder extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     const folderId = this.props.match.params.folderId;
-    const folder = { title: this.state.title };
+    const folder = { title: this.state.title, id: this.state.id };
     const url = `${config.API_ENDPOINT}/folders/${folderId}`;
     const options = {
       method: "PATCH",
@@ -44,7 +44,7 @@ export default class EditFolder extends React.Component {
         "Content-Type": "application/json"
       }
     };
-    this.context.editFolder(options.body, this.state.id);
+
     fetch(url, options)
       .then(res => {
         if (!res.ok) {
@@ -52,7 +52,8 @@ export default class EditFolder extends React.Component {
         }
       })
       .then(data => {
-        this.setState({ title: "", touched: false });
+        this.context.editFolder(folder);
+        this.setState({ title: "", id: null, touched: false });
         this.props.history.push("/");
       });
   }

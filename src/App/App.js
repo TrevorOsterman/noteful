@@ -47,37 +47,18 @@ class App extends Component {
       });
   }
 
-  // componentDidUpdate() {
-  //   Promise.all([
-  //     fetch(`${config.API_ENDPOINT}/notes`),
-  //     fetch(`${config.API_ENDPOINT}/folders`)
-  //   ])
-  //     .then(([notesRes, foldersRes]) => {
-  //       if (!notesRes.ok) return notesRes.json().then(e => Promise.reject(e));
-  //       if (!foldersRes.ok)
-  //         return foldersRes.json().then(e => Promise.reject(e));
-  //
-  //       return Promise.all([notesRes.json(), foldersRes.json()]);
-  //     })
-  //     .then(([notes, folders]) => {
-  //       console.log(notes);
-  //       console.log(folders);
-  //     })
-  //     .catch(error => {
-  //       console.error({ error });
-  //     });
-  // }
-
   addNote(note) {
     this.setState({
       notes: [...this.state.notes, note]
     });
   }
 
-  editNote(note, id) {
-    console.log(note);
+  editNote(note) {
     this.setState({
-      notes: [...this.state.notes.filter(oldNote => oldNote.id !== id), note]
+      notes: [
+        ...this.state.notes.filter(oldNote => oldNote.id !== note.id),
+        note
+      ]
     });
   }
 
@@ -85,10 +66,10 @@ class App extends Component {
     this.setState({ folders: [...this.state.folders, folder] });
   }
 
-  editFolder(folder, id) {
+  editFolder(folder) {
     this.setState({
       folders: [
-        ...this.state.folders.filter(oldFold => oldFold.id !== id),
+        ...this.state.folders.filter(oldFold => oldFold.id !== folder.id),
         folder
       ]
     });

@@ -42,7 +42,8 @@ export default class EditNote extends React.Component {
     const note = {
       title: this.state.title.value,
       content: this.state.content.value,
-      folder: this.state.folder.value
+      folder: this.state.folder.value,
+      id: this.state.id
     };
 
     const noteId = this.props.match.params.noteId;
@@ -54,8 +55,7 @@ export default class EditNote extends React.Component {
         "Content-Type": "application/json"
       }
     };
-    this.context.editNote(options.body, this.state.id);
-    this.props = this.state;
+
     fetch(url, options)
       .then(res => {
         if (!res.ok) {
@@ -63,10 +63,12 @@ export default class EditNote extends React.Component {
         }
       })
       .then(data => {
+        this.context.editNote(note);
         this.setState({
           title: { value: "", touched: false },
           content: { value: "", touched: false },
-          folder: { value: "", touched: false }
+          folder: { value: "", touched: false },
+          id: null
         });
         this.props.history.push("/");
       });
@@ -117,10 +119,7 @@ export default class EditNote extends React.Component {
           onChange={e => this.updateContent(e.target.value)}
         />
         <label>Folder:</label>
-        <select
-          value={this.state.folder.value}
-          onChange={e => this.updateFolder(e.target.value)}
-        >
+        <select onChange={e => this.updateFolder(e.target.value)}>
           {folderNames}
         </select>
         <button type="reset">Reset</button>

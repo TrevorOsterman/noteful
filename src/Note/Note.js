@@ -57,7 +57,9 @@ export default class Note extends React.Component {
         >
           <FontAwesomeIcon icon="trash-alt" /> remove
         </button>
-        <Link to={`/edit-note/${id}`}>Edit</Link>
+        <Link className="edit_link" to={`/edit-note/${id}`}>
+          edit
+        </Link>
         <div className="Note__dates">
           <div className="Note__dates-modified">
             Created{" "}
